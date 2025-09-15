@@ -9,15 +9,15 @@ interface DepositModalProps {
   nftAddress: string;
 }
 
-const DepositModal: React.FC<DepositModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  vaultAddress, 
-  nftAddress 
+const DepositModal: React.FC<DepositModalProps> = ({
+  isOpen,
+  onClose,
+  vaultAddress,
+  nftAddress
 }) => {
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { deposit } = useVault(vaultAddress);
+  const { deposit, getAPY } = useVault(vaultAddress);
   const { mintEligibility } = useNFT(nftAddress);
 
   if (!isOpen) return null;
@@ -29,19 +29,22 @@ const DepositModal: React.FC<DepositModalProps> = ({
     setIsSubmitting(true);
     try {
       await deposit(amount);
-      
+
       // Check if eligible for NFT mint
       const amountNumber = parseFloat(amount);
       const eligible = mintEligibility(amountNumber);
       if (eligible) {
-        alert('Congratulations! You are eligible for a Reward NFT!');
+        // Show success message with NFT eligibility
+        alert('🎉 Deposit successful! You are eligible for an Elite NFT that boosts your APY!');
+      } else {
+        alert('✅ Deposit successful!');
       }
-      
+
       setAmount('');
       onClose();
     } catch (error) {
       console.error('Deposit failed:', error);
-      alert('Deposit failed. Please try again.');
+      alert('❌ Deposit failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -53,63 +56,110 @@ const DepositModal: React.FC<DepositModalProps> = ({
     }
   };
 
+  const estimatedYield = amount ? (parseFloat(amount) * parseFloat(getAPY()) / 100).toFixed(4) : '0';
+  const isEligibleForNFT = amount ? mintEligibility(parseFloat(amount)) : false;
+
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    <div
+      className="fixed inset-0 modal-overlay flex items-center justify-center z-50"
       onClick={handleOverlayClick}
     >
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Deposit to Vault</h2>
+      <div className="modal-content p-8 w-full max-w-md mx-4 relative">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-white">Deposit to Vault</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl"
+            className="text-gray-400 hover:text-white text-3xl transition-colors"
           >
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="amount" className="block text-lg font-medium text-gray-300 mb-3">
               Amount (ETH)
             </label>
             <input
               type="number"
               id="amount"
-              step="0.01"
+              step="0.001"
               min="0"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="0.00"
+              className="input-cyber text-lg"
+              placeholder="0.000"
               required
             />
           </div>
 
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <p className="text-sm text-blue-700">
-              💡 Deposit more than 0.1 ETH to be eligible for a Reward NFT that provides APY boost!
-            </p>
-          </div>
+          {amount && (
+            <div className="space-y-4">
+              <div className="cyber-card p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-400">Estimated Annual Yield:</span>
+                  <span className="text-green-400 font-bold">{estimatedYield} ETH</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Current APY:</span>
+                  <span className="text-white font-medium">{getAPY()}%</span>
+                </div>
+              </div>
 
-          <div className="flex space-x-3 pt-4">
+              {isEligibleForNFT ? (
+                <div className="p-4 rounded-lg bg-gradient-to-r from-purple-900/30 via-pink-900/30 to-purple-900/30 border border-purple-500/30">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <span className="text-2xl">🎉</span>
+                    <span className="text-lg font-bold text-purple-200">NFT Eligible!</span>
+                  </div>
+                  <p className="text-purple-200 text-sm">
+                    This deposit qualifies you for an Elite NFT that provides permanent APY boosts!
+                  </p>
+                </div>
+              ) : (
+                <div className="p-4 rounded-lg bg-blue-900/20 border border-blue-500/30">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <span className="text-xl">💡</span>
+                    <span className="text-lg font-bold text-blue-200">Pro Tip</span>
+                  </div>
+                  <p className="text-blue-200 text-sm">
+                    Deposit 0.1 ETH or more to be eligible for an Elite NFT with permanent APY boosts!
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex space-x-4 pt-6">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+              className="cyber-button flex-1 px-6 py-3 font-semibold rounded-lg"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !amount || parseFloat(amount) <= 0}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-medium transition-colors"
+              className="cyber-button-primary flex-1 px-6 py-3 font-semibold rounded-lg disabled:opacity-50"
             >
-              {isSubmitting ? 'Depositing...' : 'Deposit'}
+              {isSubmitting ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="loading-shimmer w-4 h-4 rounded-full"></div>
+                  <span>Depositing...</span>
+                </div>
+              ) : (
+                'Deposit ETH'
+              )}
             </button>
           </div>
         </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-gray-400 text-sm">
+            Transaction will be processed on Somnia Network
+          </p>
+        </div>
       </div>
     </div>
   );

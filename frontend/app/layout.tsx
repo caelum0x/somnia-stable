@@ -1,22 +1,19 @@
 import React from 'react';
-import '../styles/globals.css';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import './globals.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <title>Stablecoin DeFi App</title>
-        <meta name="description" content="A decentralized finance application for stablecoins." />
+        <title>SomniaVault - Next-Gen DeFi Platform</title>
+        <meta name="description" content="Experience the future of DeFi with quantum-secured vaults, hyper yields, and exclusive NFT rewards on the Somnia network." />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
       </head>
-      <body className="bg-gray-100">
-        <Header />
-        <main className="container mx-auto p-4">
-          {children}
-        </main>
-        <Footer />
+      <body>
+        {children}
       </body>
     </html>
   );
