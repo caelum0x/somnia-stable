@@ -34,3 +34,22 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Known Vulnerabilities
+
+This project has identified the following known vulnerabilities:
+
+1. **Cookie Vulnerability**:
+   - **Package**: `cookie`
+   - **Version**: `<0.7.0`
+   - **Description**: Accepts cookie name, path, and domain with out-of-bounds characters.
+   - **Impact**: Low severity.
+   - **Mitigation**: Consider using an alternative package or reviewing the code to ensure safe handling of cookies.
+
+2. **Tmp Vulnerability**:
+   - **Package**: `tmp`
+   - **Version**: `<=0.2.3`
+   - **Description**: Allows arbitrary temporary file/directory writes via symbolic links.
+   - **Impact**: Low severity.
+   - **Mitigation**: Consider using an alternative package or reviewing the code to ensure safe handling of temporary files.
+# somnia-stable
