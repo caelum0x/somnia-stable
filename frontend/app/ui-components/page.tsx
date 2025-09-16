@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import UIComponentDemo from '../../src/components/UIComponentDemo';
 import StandardNavbar from '../../src/components/StandardNavbar';

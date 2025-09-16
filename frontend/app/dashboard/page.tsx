@@ -6,10 +6,11 @@ import Link from 'next/link';
 import StandardNavbar from '../../src/components/StandardNavbar';
 import StandardFooter from '../../src/components/StandardFooter';
 
-const CONTRACT_ADDRESSES = {
-  MANAGER: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
-  NFT: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
-};
+// Contract addresses for future use
+// const CONTRACT_ADDRESSES = {
+//   MANAGER: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
+//   NFT: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
+// };
 
 const DashboardPage: React.FC = () => {
   const [userAddress, setUserAddress] = useState<string | null>(null);
@@ -52,9 +53,9 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const shortAddress = userAddress
-    ? `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`
-    : '';
+  // const shortAddress = userAddress
+  //   ? `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`
+  //   : '';
     
   if (!userAddress) {
     return (

@@ -1,66 +1,121 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useVault } from '../hooks/useVault';
-import { useNFT } from '../hooks/useNFT';
+import { depositToVault, getWalletBalance } from '../../app/services/contractService';
 import { StandardFormField, StandardButton, StandardModal, StandardBadge } from './StandardUI';
 
 interface DepositModalProps {
   isOpen: boolean;
   onClose: () => void;
-  vaultAddress: string;
-  nftAddress: string;
+  onSuccess?: () => void;
+  vaultName?: string;
+  userAddress?: string;
 }
 
 const DepositModal: React.FC<DepositModalProps> = ({
   isOpen,
   onClose,
-  vaultAddress,
-  nftAddress
+  onSuccess,
+  vaultName = "Quantum Vault Alpha",
+  userAddress
 }) => {
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { deposit, getAPY } = useVault(vaultAddress);
-  const { mintEligibility } = useNFT(nftAddress);
+  const [error, setError] = useState('');
+  const [txHash, setTxHash] = useState('');
+  const [userBalance, setUserBalance] = useState('0');
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || parseFloat(amount) <= 0) return;
+    if (!amount || parseFloat(amount) <= 0) {
+      setError('Please enter a valid amount');
+      return;
+    }
 
     setIsSubmitting(true);
-    try {
-      await deposit(amount);
+    setError('');
+    setTxHash('');
 
+    try {
+      const tx = await depositToVault(amount);
+      setTxHash(tx.hash);
+      
       // Check if eligible for NFT mint
       const amountNumber = parseFloat(amount);
-      const eligible = mintEligibility(amountNumber);
-      if (eligible) {
-        // Show success message with NFT eligibility
-        alert('🎉 Deposit successful! You are eligible for an Elite NFT that boosts your APY!');
-      } else {
-        alert('✅ Deposit successful!');
+      const eligible = amountNumber >= 0.1; // NFT eligibility threshold
+      
+      if (onSuccess) {
+        onSuccess();
       }
 
       setAmount('');
-      onClose();
-    } catch (error) {
+      
+      // Auto-close after showing success
+      setTimeout(() => {
+        onClose();
+      }, 3000);
+      
+    } catch (error: any) {
       console.error('Deposit failed:', error);
-      alert('❌ Deposit failed. Please try again.');
+      setError(error.message || 'Deposit failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const estimatedYield = amount ? (parseFloat(amount) * parseFloat(getAPY()) / 100).toFixed(4) : '0';
-  const isEligibleForNFT = amount ? mintEligibility(parseFloat(amount)) : false;
+  // Load user balance when modal opens
+  React.useEffect(() => {
+    if (isOpen && userAddress) {
+      getWalletBalance(userAddress).then(balance => {
+        setUserBalance(parseFloat(balance).toFixed(4));
+      }).catch(console.error);
+    }
+  }, [isOpen, userAddress]);
+
+  const estimatedYield = amount ? (parseFloat(amount) * 15.2 / 100).toFixed(4) : '0'; // 15.2% APY
+  const isEligibleForNFT = amount ? parseFloat(amount) >= 0.1 : false;
+
+  const handleMaxClick = () => {
+    const maxAmount = Math.max(0, parseFloat(userBalance) - 0.01); // Leave some for gas
+    setAmount(maxAmount.toFixed(4));
+  };
+
+  const handleClose = () => {
+    if (!isSubmitting) {
+      setAmount('');
+      setError('');
+      setTxHash('');
+      onClose();
+    }
+  };
 
   return (
     <StandardModal
       isOpen={isOpen}
-      onClose={onClose}
-      title="Deposit to Vault"
+      onClose={handleClose}
+      title={`Deposit to ${vaultName}`}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+
+        {txHash && (
+          <div className="mb-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 text-sm">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span>Transaction successful!</span>
+            </div>
+            <div className="mt-2 text-xs opacity-80">
+              Hash: {txHash.slice(0, 10)}...{txHash.slice(-8)}
+            </div>
+          </div>
+        )}
+
         <StandardFormField
           id="amount"
           label="Amount (ETH)"
@@ -68,10 +123,11 @@ const DepositModal: React.FC<DepositModalProps> = ({
           placeholder="0.000"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          helperText="Balance: ~3.5 ETH"
+          helperText={`Balance: ${userBalance} ETH`}
           required
           maxButton
-          onMaxClick={() => setAmount('3.5')}
+          onMaxClick={handleMaxClick}
+          disabled={isSubmitting}
         />
 
           {amount && (
@@ -88,7 +144,7 @@ const DepositModal: React.FC<DepositModalProps> = ({
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-300">Current APY:</span>
-                  <StandardBadge variant="green">{getAPY()}%</StandardBadge>
+                  <StandardBadge variant="green">15.2%</StandardBadge>
                 </div>
                 <div className="mt-4 pt-4 border-t border-white/10">
                   <div className="flex items-center justify-between">
@@ -129,8 +185,9 @@ const DepositModal: React.FC<DepositModalProps> = ({
           <div className="flex space-x-4 pt-6">
             <StandardButton 
               variant="secondary" 
-              onClick={onClose} 
+              onClick={handleClose} 
               fullWidth
+              disabled={isSubmitting}
             >
               Cancel
             </StandardButton>
@@ -142,7 +199,7 @@ const DepositModal: React.FC<DepositModalProps> = ({
               isLoading={isSubmitting}
               fullWidth
             >
-              Deposit ETH
+              {isSubmitting ? 'Depositing...' : 'Deposit ETH'}
             </StandardButton>
           </div>
         </form>

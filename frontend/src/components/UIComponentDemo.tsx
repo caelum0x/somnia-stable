@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { 
   StandardButton, 
@@ -131,7 +133,7 @@ const UIComponentDemo: React.FC = () => {
           >
             <p className="text-body mb-2">This card has hover effects and a footer.</p>
             <div className="bg-white/5 p-3 rounded-lg">
-              <code className="text-xs text-green-300">variant="hover"</code>
+              <code className="text-xs text-green-300">variant=&quot;hover&quot;</code>
             </div>
           </StandardCard>
           
