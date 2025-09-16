@@ -83,7 +83,7 @@ export const useNFT = (nftAddress: string) => {
   useEffect(() => {
     const initContract = async () => {
       if (window.ethereum && nftAddress) {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
         const signer = await provider.getSigner();
         const nftContract = new ethers.Contract(nftAddress, NFT_ABI, signer);
         const address = await signer.getAddress();

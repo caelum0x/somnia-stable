@@ -16,7 +16,7 @@ const HomePage: React.FC = () => {
   const checkConnection = async () => {
     if (typeof window !== 'undefined' && window.ethereum) {
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
         const accounts = await provider.listAccounts();
         if (accounts.length > 0) {
           setUserAddress(accounts[0].address);
@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
     if (typeof window !== 'undefined' && window.ethereum) {
       setIsLoading(true);
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
         await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner();
         const address = await signer.getAddress();

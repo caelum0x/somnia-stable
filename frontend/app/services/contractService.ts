@@ -1,29 +1,28 @@
 import { ethers } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
 import StablecoinArtifact from '../contracts/Stablecoin.json';
 import RewardNFTArtifact from '../contracts/RewardNFT.json';
 
 declare global {
   interface Window {
-    ethereum?: any;
+    ethereum?: unknown;
   }
 }
 
-const getContract = async (contractAddress: string, artifact: any) => {
+const getContract = async (contractAddress: string, abi: any[]) => {
   if (!window.ethereum) {
     throw new Error('Ethereum provider not found');
   }
-  const provider = new Web3Provider(window.ethereum);
+  const provider = new ethers.BrowserProvider(window.ethereum as any);
   await provider.send("eth_requestAccounts", []);
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(contractAddress, artifact.abi, signer);
+  const signer = await provider.getSigner();
+  const contract = new ethers.Contract(contractAddress, abi, signer);
   return contract;
 };
 
 export const getStablecoinContract = async (stablecoinAddress: string) => {
-  return getContract(stablecoinAddress, StablecoinArtifact);
+  return getContract(stablecoinAddress, StablecoinArtifact.abi);
 };
 
 export const getRewardNFTContract = async (rewardNFTAddress: string) => {
-  return getContract(rewardNFTAddress, RewardNFTArtifact);
+  return getContract(rewardNFTAddress, RewardNFTArtifact.abi);
 };

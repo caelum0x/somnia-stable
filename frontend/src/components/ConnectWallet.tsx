@@ -7,7 +7,7 @@ const ConnectWallet = () => {
   useEffect(() => {
     const connectWallet = async () => {
       if (window.ethereum) {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
         await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner();
         const address = await signer.getAddress();

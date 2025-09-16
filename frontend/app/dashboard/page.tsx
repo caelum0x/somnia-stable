@@ -21,7 +21,7 @@ const DashboardPage: React.FC = () => {
   const checkConnection = async () => {
     if (typeof window !== 'undefined' && window.ethereum) {
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
         const accounts = await provider.listAccounts();
         if (accounts.length > 0) {
           setUserAddress(accounts[0].address);
@@ -36,7 +36,7 @@ const DashboardPage: React.FC = () => {
     if (typeof window !== 'undefined' && window.ethereum) {
       setIsLoading(true);
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
         await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
@@ -96,7 +96,7 @@ const DashboardPage: React.FC = () => {
               {isLoading ? 'Connecting...' : 'Connect Wallet'}
             </button>
             <div className="mt-6 text-gray-400">
-              <p>Make sure you're connected to Somnia Network</p>
+              <p>Make sure you&apos;re connected to Somnia Network</p>
             </div>
           </div>
         </div>

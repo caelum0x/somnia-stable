@@ -103,7 +103,7 @@ export const useManager = (managerAddress: string) => {
   useEffect(() => {
     const initContract = async () => {
       if (window.ethereum && managerAddress) {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum as any);
         const signer = await provider.getSigner();
         const managerContract = new ethers.Contract(managerAddress, MANAGER_ABI, signer);
         

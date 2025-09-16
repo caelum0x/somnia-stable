@@ -71,7 +71,7 @@ export const useVault = (vaultAddress: string) => {
   useEffect(() => {
     const initContract = async () => {
       if (window.ethereum && vaultAddress) {
-        const browserProvider = new ethers.BrowserProvider(window.ethereum);
+        const browserProvider = new ethers.BrowserProvider(window.ethereum as any);
         const userSigner = await browserProvider.getSigner();
         const vaultContract = new ethers.Contract(vaultAddress, VAULT_ABI, userSigner);
         

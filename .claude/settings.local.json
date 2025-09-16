@@ -4,7 +4,13 @@
       "Bash(rm:*)",
       "Bash(npm run dev:*)",
       "Bash(npm install)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(npx hardhat:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(ESLINT_NO_DEV_ERRORS=true npm run build)"
     ],
     "deny": [],
     "ask": []
