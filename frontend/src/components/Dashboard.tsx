@@ -43,41 +43,45 @@ const Dashboard: React.FC<DashboardProps> = ({
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* User Stats */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
+        <h1 className="text-4xl font-bold gradient-text mb-8">Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">Total TVL</h3>
-            <p className="mt-2 text-3xl font-bold text-gray-900">{totalTVL} ETH</p>
+          <div className="stats-card">
+            <span className="stats-icon">💎</span>
+            <h3 className="stats-title">Total Locked Value</h3>
+            <p className="stats-value blue">{totalTVL} ETH</p>
+            <p className="stats-desc">Across all vaults</p>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">Your Balance</h3>
-            <p className="mt-2 text-3xl font-bold text-blue-600">{userBalance} ETH</p>
+          <div className="stats-card">
+            <span className="stats-icon">👛</span>
+            <h3 className="stats-title">Your Balance</h3>
+            <p className="stats-value purple">{userBalance} ETH</p>
+            <p className="stats-desc">Total deposited assets</p>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+          <div className="stats-card">
+            <span className="stats-icon">📈</span>
+            <h3 className="stats-title">
               {hasNFT ? 'Boosted APY' : 'Global APY'}
             </h3>
-            <div className="mt-2 flex items-baseline">
-              <p className="text-3xl font-bold text-green-600">{effectiveAPY}%</p>
+            <div className="flex flex-col">
+              <p className="stats-value green">{effectiveAPY}%</p>
               {hasNFT && (
-                <span className="ml-2 text-sm text-green-500 font-medium">
-                  (+{apyBoost}% boost)
+                <span className="text-sm text-green-400 font-medium">
+                  Including {apyBoost}% boost
                 </span>
               )}
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">Reward NFTs</h3>
-            <div className="mt-2 flex items-baseline">
-              <p className="text-3xl font-bold text-purple-600">{nftBalance}</p>
-              {hasNFT && (
-                <span className="ml-2 text-sm text-purple-500 font-medium">
-                  Owned
-                </span>
-              )}
+          <div className="stats-card">
+            <span className="stats-icon">🏆</span>
+            <h3 className="stats-title">Reward NFTs</h3>
+            <div className="flex flex-col">
+              <p className="stats-value pink">{nftBalance}</p>
+              <span className="stats-desc">
+                {hasNFT ? 'Boosting your rewards' : 'None owned yet'}
+              </span>
             </div>
           </div>
         </div>
@@ -85,12 +89,17 @@ const Dashboard: React.FC<DashboardProps> = ({
 
       {/* NFT Status */}
       {hasNFT && (
-        <div className="mb-8 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6">
+        <div className="mb-8 nft-benefits-card">
           <div className="flex items-center">
+            <div className="nft-icon floating-animation">🏆</div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-purple-900">🎉 NFT Holder Benefits</h3>
-              <p className="text-purple-700">
-                You own {nftBalance} Reward NFT{nftBalance !== 1 ? 's' : ''} and receive a {apyBoost}% APY boost on all deposits!
+              <div className="flex items-center mb-2">
+                <span className="nft-badge">NFT Holder</span>
+                <span className="nft-badge">Premium</span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-1">Enhanced Yield Rewards</h3>
+              <p className="text-purple-100">
+                Your {nftBalance} Reward NFT{nftBalance !== 1 ? 's are' : ' is'} generating an additional <span className="font-bold text-purple-300">{apyBoost}% APY</span> boost on all your deposits!
               </p>
             </div>
           </div>
