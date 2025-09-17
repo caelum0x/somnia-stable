@@ -29,8 +29,15 @@ export interface RewardNFTInterface extends Interface {
       | "approve"
       | "balanceOf"
       | "getApproved"
+      | "getUserBoost"
       | "isApprovedForAll"
+      | "mint"
+      | "mintAccess"
+      | "mintGenesis"
+      | "mintMultiplier"
       | "name"
+      | "nftBoosts"
+      | "nftTypes"
       | "owner"
       | "ownerOf"
       | "renounceOwnership"
@@ -39,7 +46,9 @@ export interface RewardNFTInterface extends Interface {
       | "setApprovalForAll"
       | "supportsInterface"
       | "symbol"
+      | "tokenOfOwnerByIndex"
       | "tokenURI"
+      | "totalSupply"
       | "transferFrom"
       | "transferOwnership"
   ): FunctionFragment;
@@ -65,10 +74,38 @@ export interface RewardNFTInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getUserBoost",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [AddressLike, AddressLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "mint",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintAccess",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintGenesis",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintMultiplier",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "nftBoosts",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nftTypes",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
@@ -96,8 +133,16 @@ export interface RewardNFTInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "tokenOfOwnerByIndex",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "tokenURI",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalSupply",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "transferFrom",
@@ -115,10 +160,26 @@ export interface RewardNFTInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getUserBoost",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintAccess", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "mintGenesis",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "mintMultiplier",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nftBoosts", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nftTypes", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
@@ -142,7 +203,15 @@ export interface RewardNFTInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenOfOwnerByIndex",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalSupply",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
     data: BytesLike
@@ -277,13 +346,35 @@ export interface RewardNFT extends BaseContract {
 
   getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
 
+  getUserBoost: TypedContractMethod<[user: AddressLike], [bigint], "view">;
+
   isApprovedForAll: TypedContractMethod<
     [owner: AddressLike, operator: AddressLike],
     [boolean],
     "view"
   >;
 
+  mint: TypedContractMethod<
+    [to: AddressLike, nftType: BigNumberish],
+    [bigint],
+    "nonpayable"
+  >;
+
+  mintAccess: TypedContractMethod<[to: AddressLike], [bigint], "nonpayable">;
+
+  mintGenesis: TypedContractMethod<[to: AddressLike], [bigint], "nonpayable">;
+
+  mintMultiplier: TypedContractMethod<
+    [to: AddressLike],
+    [bigint],
+    "nonpayable"
+  >;
+
   name: TypedContractMethod<[], [string], "view">;
+
+  nftBoosts: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+
+  nftTypes: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
 
   owner: TypedContractMethod<[], [string], "view">;
 
@@ -322,7 +413,15 @@ export interface RewardNFT extends BaseContract {
 
   symbol: TypedContractMethod<[], [string], "view">;
 
+  tokenOfOwnerByIndex: TypedContractMethod<
+    [owner: AddressLike, index: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
   tokenURI: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+
+  totalSupply: TypedContractMethod<[], [bigint], "view">;
 
   transferFrom: TypedContractMethod<
     [from: AddressLike, to: AddressLike, tokenId: BigNumberish],
@@ -354,6 +453,9 @@ export interface RewardNFT extends BaseContract {
     nameOrSignature: "getApproved"
   ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
   getFunction(
+    nameOrSignature: "getUserBoost"
+  ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
+  getFunction(
     nameOrSignature: "isApprovedForAll"
   ): TypedContractMethod<
     [owner: AddressLike, operator: AddressLike],
@@ -361,8 +463,30 @@ export interface RewardNFT extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "mint"
+  ): TypedContractMethod<
+    [to: AddressLike, nftType: BigNumberish],
+    [bigint],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "mintAccess"
+  ): TypedContractMethod<[to: AddressLike], [bigint], "nonpayable">;
+  getFunction(
+    nameOrSignature: "mintGenesis"
+  ): TypedContractMethod<[to: AddressLike], [bigint], "nonpayable">;
+  getFunction(
+    nameOrSignature: "mintMultiplier"
+  ): TypedContractMethod<[to: AddressLike], [bigint], "nonpayable">;
+  getFunction(
     nameOrSignature: "name"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "nftBoosts"
+  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "nftTypes"
+  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
@@ -405,8 +529,18 @@ export interface RewardNFT extends BaseContract {
     nameOrSignature: "symbol"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "tokenOfOwnerByIndex"
+  ): TypedContractMethod<
+    [owner: AddressLike, index: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "tokenURI"
   ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "totalSupply"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "transferFrom"
   ): TypedContractMethod<

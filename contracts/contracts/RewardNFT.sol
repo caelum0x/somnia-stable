@@ -16,7 +16,7 @@ contract RewardNFT is ERC721, Ownable {
         _tokenIdCounter = 1; // Start from token ID 1
     }
 
-    function mint(address to, NFTType nftType) external returns (uint256) {
+    function mint(address to, NFTType nftType) public returns (uint256) {
         uint256 tokenId = _tokenIdCounter;
         _tokenIdCounter++;
         

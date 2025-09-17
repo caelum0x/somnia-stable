@@ -13,7 +13,12 @@
       "Bash(ESLINT_NO_DEV_ERRORS=true npm run build)",
       "WebSearch",
       "WebFetch(domain:docs.somnia.network)",
-      "WebFetch(domain:testnet.somnia.network)"
+      "WebFetch(domain:testnet.somnia.network)",
+      "Bash(if [ -f .env ])",
+      "Bash(then echo \"✅ .env file exists\")",
+      "Bash(else echo \"⚠️ .env file not found\")",
+      "Bash(fi)",
+      "Bash(source .env)"
     ],
     "deny": [],
     "ask": []

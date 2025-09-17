@@ -5,7 +5,12 @@ async function main() {
   console.log("🚀 DEPLOYING TO SOMNIA TESTNET");
   console.log("=" * 50);
   
-  const [deployer] = await ethers.getSigners();
+  const signers = await ethers.getSigners();
+  if (signers.length === 0) {
+    throw new Error("No signers available. Please check your PRIVATE_KEY in .env file");
+  }
+  
+  const deployer = signers[0];
   const network = await ethers.provider.getNetwork();
 
   console.log("\n📋 Deployment Information:");
