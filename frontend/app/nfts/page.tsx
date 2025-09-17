@@ -4,10 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import StandardNavbar from '../../src/components/StandardNavbar';
 import StandardFooter from '../../src/components/StandardFooter';
+import { mintGenesisNFT, mintMultiplierNFT, mintAccessNFT } from '../services/contractService';
 
 const NFTsPage: React.FC = () => {
   const [userAddress, setUserAddress] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [mintingNFT, setMintingNFT] = useState<number | null>(null);
+  const [txHash, setTxHash] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     checkConnection();
@@ -56,7 +60,8 @@ const NFTsPage: React.FC = () => {
       minted: "247",
       description: "Permanent APY boost for all vault deposits",
       rarity: "Legendary",
-      icon: "💎"
+      icon: "💎",
+      mintFunction: mintGenesisNFT
     },
     {
       id: 2,
@@ -67,7 +72,8 @@ const NFTsPage: React.FC = () => {
       minted: "683",
       description: "Enhanced yield multiplier with stacking benefits",
       rarity: "Epic",
-      icon: "⚡"
+      icon: "⚡",
+      mintFunction: mintMultiplierNFT
     },
     {
       id: 3,
@@ -78,9 +84,37 @@ const NFTsPage: React.FC = () => {
       minted: "1456",
       description: "Exclusive access to premium vaults and features",
       rarity: "Rare",
-      icon: "🌟"
+      icon: "🌟",
+      mintFunction: mintAccessNFT
     }
   ];
+
+  const handleMintNFT = async (nft: any) => {
+    if (!userAddress) {
+      setError('Please connect your wallet first');
+      return;
+    }
+
+    setMintingNFT(nft.id);
+    setError('');
+    setTxHash('');
+
+    try {
+      const tx = await nft.mintFunction(userAddress);
+      setTxHash(tx.hash);
+      
+      // Reset after showing success
+      setTimeout(() => {
+        setTxHash('');
+        setMintingNFT(null);
+      }, 5000);
+      
+    } catch (error: any) {
+      console.error('NFT minting failed:', error);
+      setError(error.message || 'Minting failed. Please try again.');
+      setMintingNFT(null);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -99,6 +133,25 @@ const NFTsPage: React.FC = () => {
             Mint exclusive NFTs that provide permanent benefits, yield boosts, and VIP access to premium features
           </p>
         </div>
+
+        {/* Global Status Messages */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400">
+            {error}
+          </div>
+        )}
+
+        {txHash && (
+          <div className="mb-6 p-4 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span>NFT minting successful!</span>
+            </div>
+            <div className="mt-2 text-xs opacity-80">
+              Hash: {txHash.slice(0, 10)}...{txHash.slice(-8)}
+            </div>
+          </div>
+        )}
 
         <div className="nft-benefits-card mb-12">
           <div className="flex items-center mb-4">
@@ -168,8 +221,19 @@ const NFTsPage: React.FC = () => {
               </div>
               
               {userAddress ? (
-                <button className="cyber-button-primary w-full py-3 text-base font-bold rounded">
-                  Mint NFT
+                <button 
+                  onClick={() => handleMintNFT(nft)}
+                  disabled={mintingNFT === nft.id}
+                  className="cyber-button-primary w-full py-3 text-base font-bold rounded disabled:opacity-50"
+                >
+                  {mintingNFT === nft.id ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Minting...</span>
+                    </div>
+                  ) : (
+                    'Mint NFT'
+                  )}
                 </button>
               ) : (
                 <button 

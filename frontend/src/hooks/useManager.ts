@@ -1,137 +1,33 @@
 import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
+import { 
+  getVaultManagerContract,
+  getVaultBalance,
+  getUserVaultBalance
+} from '../../app/services/contractService';
 
-const MANAGER_ABI = [
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_stableVaultAddress",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_vaultAddress",
-        "type": "address"
-      }
-    ],
-    "name": "addVault",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "deposit",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getTotalBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getUserBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getVaults",
-    "outputs": [
-      {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-];
-
-export const useManager = (managerAddress: string) => {
-  const [contract, setContract] = useState<ethers.Contract | null>(null);
-  const [vaults, setVaults] = useState<string[]>([]);
+export const useManager = (managerAddress?: string) => {
+  const [vaults, setVaults] = useState<string[]>(['0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9']);
   const [totalTVL, setTotalTVL] = useState<string>('0');
   const [userBalance, setUserBalance] = useState<string>('0');
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const initContract = async () => {
-      if (window.ethereum && managerAddress) {
-        const provider = new ethers.BrowserProvider(window.ethereum as any);
-        const signer = await provider.getSigner();
-        const managerContract = new ethers.Contract(managerAddress, MANAGER_ABI, signer);
-        
-        setContract(managerContract);
-      }
-    };
-
-    initContract();
-  }, [managerAddress]);
-
   const getVaults = async () => {
-    if (!contract) return;
     try {
+      const contract = await getVaultManagerContract();
       const vaultAddresses = await contract.getVaults();
       setVaults(vaultAddresses);
       return vaultAddresses;
     } catch (error) {
       console.error('Error getting vaults:', error);
-      return [];
+      return vaults;
     }
   };
 
   const getTotalTVL = async () => {
-    if (!contract) return;
     try {
-      const balance = await contract.getTotalBalance();
-      setTotalTVL(ethers.formatEther(balance));
-      return ethers.formatEther(balance);
+      const balance = await getVaultBalance();
+      setTotalTVL(balance);
+      return balance;
     } catch (error) {
       console.error('Error getting total TVL:', error);
       return '0';
@@ -139,48 +35,42 @@ export const useManager = (managerAddress: string) => {
   };
 
   const getUserBalance = async () => {
-    if (!contract) return;
     try {
-      const balance = await contract.getUserBalance();
-      setUserBalance(ethers.formatEther(balance));
-      return ethers.formatEther(balance);
+      const balance = await getUserVaultBalance();
+      setUserBalance(balance);
+      return balance;
     } catch (error) {
       console.error('Error getting user balance:', error);
       return '0';
     }
   };
 
-  const addVault = async (vaultAddress: string) => {
-    if (!contract) return;
+  const getGlobalAPY = () => {
+    const baseAPY = 12.5;
+    const tvlMultiplier = parseFloat(totalTVL) > 1000 ? 1.2 : 1.0;
+    return (baseAPY * tvlMultiplier).toFixed(1);
+  };
+
+  const refreshData = async () => {
     setLoading(true);
     try {
-      const tx = await contract.addVault(vaultAddress);
-      await tx.wait();
-      await getVaults();
-      return tx;
+      await Promise.all([
+        getVaults(),
+        getTotalTVL(),
+        getUserBalance()
+      ]);
     } catch (error) {
-      console.error('Error adding vault:', error);
-      throw error;
+      console.error('Error refreshing data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const getGlobalAPY = () => {
-    // Placeholder logic - calculate weighted average APY
-    return '4.5';
-  };
-
   useEffect(() => {
-    if (contract) {
-      getVaults();
-      getTotalTVL();
-      getUserBalance();
-    }
-  }, [contract]);
+    refreshData();
+  }, []);
 
   return {
-    contract,
     vaults,
     totalTVL,
     userBalance,
@@ -188,7 +78,7 @@ export const useManager = (managerAddress: string) => {
     getVaults,
     getTotalTVL,
     getUserBalance,
-    addVault,
-    getGlobalAPY
+    getGlobalAPY,
+    refreshData
   };
 };

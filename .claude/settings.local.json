@@ -10,7 +10,10 @@
       "Bash(npx hardhat:*)",
       "Bash(mkdir:*)",
       "Bash(cp:*)",
-      "Bash(ESLINT_NO_DEV_ERRORS=true npm run build)"
+      "Bash(ESLINT_NO_DEV_ERRORS=true npm run build)",
+      "WebSearch",
+      "WebFetch(domain:docs.somnia.network)",
+      "WebFetch(domain:testnet.somnia.network)"
     ],
     "deny": [],
     "ask": []

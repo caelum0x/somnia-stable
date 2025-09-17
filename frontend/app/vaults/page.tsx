@@ -4,10 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import StandardNavbar from '../../src/components/StandardNavbar';
 import StandardFooter from '../../src/components/StandardFooter';
+import DepositModal from '../../src/components/DepositModal';
+import WithdrawModal from '../../src/components/WithdrawModal';
 
 const VaultsPage: React.FC = () => {
   const [userAddress, setUserAddress] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [selectedVault, setSelectedVault] = useState<any>(null);
 
   useEffect(() => {
     checkConnection();
@@ -76,6 +81,21 @@ const VaultsPage: React.FC = () => {
     }
   ];
 
+  const handleDeposit = (vault: any) => {
+    setSelectedVault(vault);
+    setShowDepositModal(true);
+  };
+
+  const handleWithdraw = (vault: any) => {
+    setSelectedVault(vault);
+    setShowWithdrawModal(true);
+  };
+
+  const handleTransactionSuccess = () => {
+    // Refresh data or show success message
+    console.log('Transaction successful!');
+  };
+
   return (
     <div className="min-h-screen">
       <StandardNavbar 
@@ -126,9 +146,20 @@ const VaultsPage: React.FC = () => {
               </div>
               
               {userAddress ? (
-                <button className="cyber-button-primary w-full py-3 text-base font-bold rounded">
-                  Deposit
-                </button>
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => handleDeposit(vault)}
+                    className="cyber-button-primary w-full py-3 text-base font-bold rounded"
+                  >
+                    Deposit
+                  </button>
+                  <button 
+                    onClick={() => handleWithdraw(vault)}
+                    className="cyber-button w-full py-2 text-sm font-semibold rounded"
+                  >
+                    Withdraw
+                  </button>
+                </div>
               ) : (
                 <button 
                   onClick={connectWallet}
@@ -172,6 +203,23 @@ const VaultsPage: React.FC = () => {
       </div>
 
       <StandardFooter />
+      
+      {/* Modals */}
+      <DepositModal
+        isOpen={showDepositModal}
+        onClose={() => setShowDepositModal(false)}
+        onSuccess={handleTransactionSuccess}
+        vaultName={selectedVault?.name}
+        userAddress={userAddress || undefined}
+      />
+      
+      <WithdrawModal
+        isOpen={showWithdrawModal}
+        onClose={() => setShowWithdrawModal(false)}
+        onSuccess={handleTransactionSuccess}
+        vaultName={selectedVault?.name}
+        userAddress={userAddress || undefined}
+      />
     </div>
   );
 };

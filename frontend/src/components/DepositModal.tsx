@@ -25,6 +25,15 @@ const DepositModal: React.FC<DepositModalProps> = ({
   const [txHash, setTxHash] = useState('');
   const [userBalance, setUserBalance] = useState('0');
 
+  // Load user balance when modal opens
+  React.useEffect(() => {
+    if (isOpen && userAddress) {
+      getWalletBalance(userAddress).then(balance => {
+        setUserBalance(parseFloat(balance).toFixed(4));
+      }).catch(console.error);
+    }
+  }, [isOpen, userAddress]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,15 +73,6 @@ const DepositModal: React.FC<DepositModalProps> = ({
       setIsSubmitting(false);
     }
   };
-
-  // Load user balance when modal opens
-  React.useEffect(() => {
-    if (isOpen && userAddress) {
-      getWalletBalance(userAddress).then(balance => {
-        setUserBalance(parseFloat(balance).toFixed(4));
-      }).catch(console.error);
-    }
-  }, [isOpen, userAddress]);
 
   const estimatedYield = amount ? (parseFloat(amount) * 15.2 / 100).toFixed(4) : '0'; // 15.2% APY
   const isEligibleForNFT = amount ? parseFloat(amount) >= 0.1 : false;

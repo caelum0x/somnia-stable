@@ -25,6 +25,15 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({
   const [txHash, setTxHash] = useState('');
   const [vaultBalance, setVaultBalance] = useState('0');
 
+  // Load user vault balance when modal opens
+  React.useEffect(() => {
+    if (isOpen && userAddress) {
+      getUserVaultBalance().then(balance => {
+        setVaultBalance(parseFloat(balance).toFixed(4));
+      }).catch(console.error);
+    }
+  }, [isOpen, userAddress]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,15 +74,6 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({
       setIsSubmitting(false);
     }
   };
-
-  // Load user vault balance when modal opens
-  React.useEffect(() => {
-    if (isOpen && userAddress) {
-      getUserVaultBalance().then(balance => {
-        setVaultBalance(parseFloat(balance).toFixed(4));
-      }).catch(console.error);
-    }
-  }, [isOpen, userAddress]);
 
   const handleMaxClick = () => {
     setAmount(vaultBalance);

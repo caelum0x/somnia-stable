@@ -138,14 +138,15 @@ const Dashboard: React.FC<DashboardProps> = ({
       <DepositModal
         isOpen={showDepositModal}
         onClose={() => setShowDepositModal(false)}
-        vaultAddress={selectedVault}
-        nftAddress={nftAddress}
+        vaultName="Quantum Vault Alpha"
+        userAddress={userAddress || undefined}
       />
       
       <WithdrawModal
         isOpen={showWithdrawModal}
         onClose={() => setShowWithdrawModal(false)}
-        vaultAddress={selectedVault}
+        vaultName="Quantum Vault Alpha"
+        userAddress={userAddress || undefined}
       />
     </div>
   );

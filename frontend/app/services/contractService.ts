@@ -10,6 +10,25 @@ declare global {
   }
 }
 
+// Somnia Network Configuration
+export const SOMNIA_NETWORK = {
+  MAINNET: {
+    chainId: 5031,
+    name: 'Somnia Mainnet',
+    symbol: 'SOMI',
+    rpcUrl: 'https://api.infra.mainnet.somnia.network/',
+    explorerUrl: 'https://explorer.somnia.network'
+  },
+  TESTNET: {
+    chainId: 50312,
+    name: 'Somnia Testnet',
+    symbol: 'STT',
+    rpcUrl: 'https://dream-rpc.somnia.network/',
+    explorerUrl: 'https://shannon-explorer.somnia.network/',
+    faucetUrl: 'https://testnet.somnia.network/'
+  }
+};
+
 // Contract addresses from deployment
 export const CONTRACT_ADDRESSES = {
   STABLECOIN: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
@@ -105,13 +124,35 @@ export const getUserVaultBalance = async () => {
 };
 
 // NFT functions
-export const mintRewardNFT = async (to: string) => {
+export const mintGenesisNFT = async (to: string) => {
   try {
     const rewardNFT = await getRewardNFTContract();
-    const tx = await rewardNFT.mint(to);
+    const tx = await rewardNFT.mintGenesis(to);
     return await tx.wait();
   } catch (error) {
-    console.error('Error minting NFT:', error);
+    console.error('Error minting Genesis NFT:', error);
+    throw error;
+  }
+};
+
+export const mintMultiplierNFT = async (to: string) => {
+  try {
+    const rewardNFT = await getRewardNFTContract();
+    const tx = await rewardNFT.mintMultiplier(to);
+    return await tx.wait();
+  } catch (error) {
+    console.error('Error minting Multiplier NFT:', error);
+    throw error;
+  }
+};
+
+export const mintAccessNFT = async (to: string) => {
+  try {
+    const rewardNFT = await getRewardNFTContract();
+    const tx = await rewardNFT.mintAccess(to);
+    return await tx.wait();
+  } catch (error) {
+    console.error('Error minting Access NFT:', error);
     throw error;
   }
 };
@@ -123,6 +164,28 @@ export const getUserNFTBalance = async (userAddress: string) => {
     return balance.toString();
   } catch (error) {
     console.error('Error getting NFT balance:', error);
+    throw error;
+  }
+};
+
+export const getUserNFTBoost = async (userAddress: string) => {
+  try {
+    const rewardNFT = await getRewardNFTContract();
+    const boost = await rewardNFT.getUserBoost(userAddress);
+    return boost.toString();
+  } catch (error) {
+    console.error('Error getting user NFT boost:', error);
+    throw error;
+  }
+};
+
+export const getTotalNFTSupply = async () => {
+  try {
+    const rewardNFT = await getRewardNFTContract();
+    const supply = await rewardNFT.totalSupply();
+    return supply.toString();
+  } catch (error) {
+    console.error('Error getting total NFT supply:', error);
     throw error;
   }
 };
