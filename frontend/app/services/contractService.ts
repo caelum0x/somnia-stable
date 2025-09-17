@@ -29,13 +29,31 @@ export const SOMNIA_NETWORK = {
   }
 };
 
-// Contract addresses from deployment
-export const CONTRACT_ADDRESSES = {
+// Load contract addresses from deployment
+let CONTRACT_ADDRESSES = {
   STABLECOIN: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
   REWARD_NFT: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
   VAULT_MANAGER: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
   STABLE_VAULT: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
 };
+
+// Try to load deployed addresses if available
+try {
+  const deployedContracts = require('./deployed-contracts.json');
+  if (deployedContracts.network === 'somniaTestnet') {
+    CONTRACT_ADDRESSES = {
+      STABLECOIN: deployedContracts.Stablecoin,
+      REWARD_NFT: deployedContracts.RewardNFT,
+      VAULT_MANAGER: deployedContracts.VaultManager,
+      STABLE_VAULT: deployedContracts.StableVault,
+    };
+    console.log('✅ Using deployed contract addresses from Somnia testnet');
+  }
+} catch (error) {
+  console.log('📝 Using default contract addresses - deploy contracts to update');
+}
+
+export { CONTRACT_ADDRESSES };
 
 const getContract = async (contractAddress: string, abi: any[]) => {
   if (!window.ethereum) {

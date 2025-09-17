@@ -39,13 +39,21 @@ async function main() {
   const stablecoinAddress = await stablecoin.getAddress();
   console.log("✅ Stablecoin deployed to:", stablecoinAddress);
 
+  // Get network info
+  const network = await ethers.provider.getNetwork();
+  const networkName = network.name === "unknown" ? 
+    (network.chainId === 50312n ? "somniaTestnet" : 
+     network.chainId === 5031n ? "somniaMainnet" : "localhost") : 
+    network.name;
+
   // Save deployment addresses
   const addresses = {
     StableVault: stableVaultAddress,
     VaultManager: vaultManagerAddress,
     RewardNFT: rewardNFTAddress,
     Stablecoin: stablecoinAddress,
-    network: "localhost",
+    network: networkName,
+    chainId: Number(network.chainId),
     deployer: deployer.address
   };
 
