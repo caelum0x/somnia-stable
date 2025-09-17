@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useManager } from '../hooks/useManager';
 import { useNFT } from '../hooks/useNFT';
+import { useRealTimeData } from '../hooks/useRealTimeData';
 import VaultCard from './VaultCard';
 import DepositModal from './DepositModal';
 import WithdrawModal from './WithdrawModal';
+import { QuantumParticles, QuantumGrid, DataStream } from './QuantumEffects';
 
 interface DashboardProps {
-  managerAddress: string;
-  nftAddress: string;
-  userAddress: string;
+  managerAddress?: string;
+  nftAddress?: string;
+  userAddress?: string;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ 
@@ -19,8 +21,10 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [selectedVault, setSelectedVault] = useState<string>('');
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
   
-  const { vaults, totalTVL, userBalance, getGlobalAPY } = useManager(managerAddress);
+  const { userData, vaultData, protocolData, refreshData } = useRealTimeData();
+  const { vaults, getGlobalAPY } = useManager(managerAddress);
   const { hasNFT, nftBalance, getAPYBoost } = useNFT(nftAddress);
 
   const globalAPY = getGlobalAPY();
@@ -28,6 +32,11 @@ const Dashboard: React.FC<DashboardProps> = ({
   const effectiveAPY = hasNFT 
     ? (parseFloat(globalAPY) + parseFloat(apyBoost)).toFixed(1)
     : globalAPY;
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleDeposit = (vaultAddress: string) => {
     setSelectedVault(vaultAddress);
@@ -40,113 +49,220 @@ const Dashboard: React.FC<DashboardProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* User Stats */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold gradient-text mb-8">Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="stats-card">
-            <span className="stats-icon">💎</span>
-            <h3 className="stats-title">Total Locked Value</h3>
-            <p className="stats-value blue">{totalTVL} ETH</p>
-            <p className="stats-desc">Across all vaults</p>
-          </div>
-          
-          <div className="stats-card">
-            <span className="stats-icon">👛</span>
-            <h3 className="stats-title">Your Balance</h3>
-            <p className="stats-value purple">{userBalance} ETH</p>
-            <p className="stats-desc">Total deposited assets</p>
-          </div>
-          
-          <div className="stats-card">
-            <span className="stats-icon">📈</span>
-            <h3 className="stats-title">
-              {hasNFT ? 'Boosted APY' : 'Global APY'}
-            </h3>
-            <div className="flex flex-col">
-              <p className="stats-value green">{effectiveAPY}%</p>
-              {hasNFT && (
-                <span className="text-sm text-green-400 font-medium">
-                  Including {apyBoost}% boost
-                </span>
-              )}
-            </div>
-          </div>
-          
-          <div className="stats-card">
-            <span className="stats-icon">🏆</span>
-            <h3 className="stats-title">Reward NFTs</h3>
-            <div className="flex flex-col">
-              <p className="stats-value pink">{nftBalance}</p>
-              <span className="stats-desc">
-                {hasNFT ? 'Boosting your rewards' : 'None owned yet'}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* NFT Status */}
-      {hasNFT && (
-        <div className="mb-8 nft-benefits-card">
-          <div className="flex items-center">
-            <div className="nft-icon floating-animation">🏆</div>
-            <div className="flex-1">
-              <div className="flex items-center mb-2">
-                <span className="nft-badge">NFT Holder</span>
-                <span className="nft-badge">Premium</span>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-1">Enhanced Yield Rewards</h3>
-              <p className="text-purple-100">
-                Your {nftBalance} Reward NFT{nftBalance !== 1 ? 's are' : ' is'} generating an additional <span className="font-bold text-purple-300">{apyBoost}% APY</span> boost on all your deposits!
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 text-white relative">
+      {/* Quantum Background Effects */}
+      <QuantumGrid />
+      <QuantumParticles count={30} interactive={true} />
+      <DataStream direction="up" speed={1.5} density={0.2} color="cyan" />
+      <DataStream direction="down" speed={2} density={0.1} color="purple" />
+      
+      {/* Futuristic Header */}
+      <div className="relative overflow-hidden z-10">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                QUANTUM DASHBOARD
+              </h1>
+              <p className="text-cyan-300/80 text-lg">
+                {currentTime.toLocaleTimeString()} • Somnia Network • Online
               </p>
             </div>
+            <div className="text-right">
+              <div className="bg-cyan-500/20 backdrop-blur-sm border border-cyan-500/30 rounded-lg px-4 py-2">
+                <p className="text-cyan-300 text-sm">NETWORK STATUS</p>
+                <p className="text-cyan-400 font-mono font-bold">⚡ OPERATIONAL</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Futuristic Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <div className="relative bg-slate-900/80 backdrop-blur-sm border border-cyan-500/30 rounded-xl p-6 hover:border-cyan-400/50 transition-all duration-300">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
+                    <span className="text-2xl">💎</span>
+                  </div>
+                  <div className="text-cyan-400 font-mono text-sm">TVL</div>
+                </div>
+                <h3 className="text-gray-300 text-sm mb-2">Total Value Locked</h3>
+                <p className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                  {protocolData.totalValueLocked} ETH
+                </p>
+                <p className="text-gray-500 text-xs mt-1">Across {vaults.length} quantum vaults</p>
+              </div>
+            </div>
+
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <div className="relative bg-slate-900/80 backdrop-blur-sm border border-purple-500/30 rounded-xl p-6 hover:border-purple-400/50 transition-all duration-300">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                    <span className="text-2xl">👛</span>
+                  </div>
+                  <div className="text-purple-400 font-mono text-sm">BAL</div>
+                </div>
+                <h3 className="text-gray-300 text-sm mb-2">Your Balance</h3>
+                <p className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  {userData.vaultBalance} ETH
+                </p>
+                <p className="text-gray-500 text-xs mt-1">Wallet: {parseFloat(userData.walletBalance).toFixed(4)} ETH</p>
+              </div>
+            </div>
+
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <div className="relative bg-slate-900/80 backdrop-blur-sm border border-green-500/30 rounded-xl p-6 hover:border-green-400/50 transition-all duration-300">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                    <span className="text-2xl">📈</span>
+                  </div>
+                  <div className="text-green-400 font-mono text-sm">APY</div>
+                </div>
+                <h3 className="text-gray-300 text-sm mb-2">
+                  {hasNFT ? 'Quantum Boosted APY' : 'Base APY'}
+                </h3>
+                <p className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                  {effectiveAPY}%
+                </p>
+                {hasNFT && (
+                  <p className="text-green-400 text-xs mt-1 font-semibold">
+                    +{apyBoost}% NFT BOOST ACTIVE
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <div className="relative bg-slate-900/80 backdrop-blur-sm border border-orange-500/30 rounded-xl p-6 hover:border-orange-400/50 transition-all duration-300">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                    <span className="text-2xl">🏆</span>
+                  </div>
+                  <div className="text-orange-400 font-mono text-sm">NFT</div>
+                </div>
+                <h3 className="text-gray-300 text-sm mb-2">Quantum NFTs</h3>
+                <p className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+                  {nftBalance}
+                </p>
+                <p className="text-gray-500 text-xs mt-1">
+                  {hasNFT ? 'Enhancing rewards' : 'Mint to boost yields'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quantum NFT Status */}
+          {hasNFT && (
+            <div className="mb-8 relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              <div className="relative bg-gradient-to-r from-purple-900/50 to-pink-900/50 backdrop-blur-sm border border-purple-500/40 rounded-2xl p-6">
+                <div className="flex items-center space-x-6">
+                  <div className="relative">
+                    <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center animate-pulse">
+                      <span className="text-4xl">🏆</span>
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-xs">✓</span>
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <span className="px-3 py-1 bg-purple-500/30 border border-purple-400/50 rounded-full text-purple-300 text-sm font-semibold">
+                        QUANTUM HOLDER
+                      </span>
+                      <span className="px-3 py-1 bg-pink-500/30 border border-pink-400/50 rounded-full text-pink-300 text-sm font-semibold">
+                        PREMIUM TIER
+                      </span>
+                    </div>
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                      Quantum Enhancement Active
+                    </h3>
+                    <p className="text-gray-300">
+                      Your <span className="text-purple-400 font-bold">{nftBalance}</span> Quantum NFT{nftBalance !== 1 ? 's are' : ' is'} generating a 
+                      <span className="text-pink-400 font-bold text-lg"> +{apyBoost}% APY</span> boost across all deposits!
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-green-400 font-mono text-sm mb-1">BOOST ACTIVE</div>
+                    <div className="text-3xl font-bold text-green-400">+{apyBoost}%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Quantum Vaults Grid */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-8">
+              Quantum Vault Matrix
+            </h2>
+            {vaults.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="bg-slate-900/50 backdrop-blur-sm border border-gray-500/30 rounded-2xl p-8">
+                  <div className="text-6xl mb-4">⚡</div>
+                  <p className="text-gray-400 text-lg">Quantum vaults initializing...</p>
+                  <div className="mt-4 animate-pulse flex justify-center space-x-1">
+                    <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {vaults.map((vaultAddress, index) => (
+                  <VaultCard
+                    key={vaultAddress}
+                    vaultAddress={vaultAddress}
+                    onDeposit={handleDeposit}
+                    onWithdraw={handleWithdraw}
+                    index={index}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Quantum Connection Status */}
+          <div className="bg-slate-900/30 backdrop-blur-sm border border-cyan-500/30 rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <p className="text-cyan-300 text-sm">
+                  Quantum Link Active: <span className="font-mono font-medium text-cyan-400">
+                    {userData.address ? `${userData.address.slice(0, 6)}...${userData.address.slice(-4)}` : 'Connecting...'}
+                  </span>
+                </p>
+              </div>
+              <button 
+                onClick={refreshData}
+                className="px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-cyan-400 text-sm hover:bg-cyan-500/30 transition-all duration-200"
+              >
+                ⟳ Refresh
+              </button>
+            </div>
           </div>
         </div>
-      )}
-
-      {/* Vaults Grid */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Available Vaults</h2>
-        {vaults.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <p className="text-gray-500">No vaults available. Check back later!</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {vaults.map((vaultAddress) => (
-              <VaultCard
-                key={vaultAddress}
-                vaultAddress={vaultAddress}
-                onDeposit={handleDeposit}
-                onWithdraw={handleWithdraw}
-              />
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* Connected Account */}
-      <div className="bg-gray-50 rounded-lg p-4">
-        <p className="text-sm text-gray-600">
-          Connected as: <span className="font-mono font-medium">{userAddress}</span>
-        </p>
-      </div>
-
-      {/* Modals */}
+      {/* Quantum Modals */}
       <DepositModal
         isOpen={showDepositModal}
         onClose={() => setShowDepositModal(false)}
         vaultName="Quantum Vault Alpha"
-        userAddress={userAddress || undefined}
+        userAddress={userData.address || undefined}
       />
       
       <WithdrawModal
         isOpen={showWithdrawModal}
         onClose={() => setShowWithdrawModal(false)}
         vaultName="Quantum Vault Alpha"
-        userAddress={userAddress || undefined}
+        userAddress={userData.address || undefined}
       />
     </div>
   );

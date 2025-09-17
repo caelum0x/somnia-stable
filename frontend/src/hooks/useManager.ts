@@ -68,7 +68,7 @@ export const useManager = (managerAddress?: string) => {
 
   useEffect(() => {
     refreshData();
-  }, []);
+  }, [refreshData]);
 
   return {
     vaults,

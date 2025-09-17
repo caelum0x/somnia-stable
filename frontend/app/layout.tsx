@@ -1,5 +1,6 @@
 import React from 'react';
 import './globals.css';
+import './quantum-animations.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

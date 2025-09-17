@@ -1,147 +1,98 @@
 import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
+import {
+  getUserNFTBalance,
+  getUserNFTBoost,
+  checkWalletConnection
+} from '../../app/services/contractService';
 
-const NFT_ABI = [
-  {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "name": "balanceOf",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "ownerOf",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "name",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "symbol",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-];
-
-export const useNFT = (nftAddress: string) => {
-  const [contract, setContract] = useState<ethers.Contract | null>(null);
+export const useNFT = (nftAddress?: string) => {
   const [userAddress, setUserAddress] = useState<string>('');
   const [nftBalance, setNftBalance] = useState<number>(0);
   const [hasNFT, setHasNFT] = useState<boolean>(false);
+  const [boostPercentage, setBoostPercentage] = useState<string>('0');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const initContract = async () => {
-      if (window.ethereum && nftAddress) {
-        const provider = new ethers.BrowserProvider(window.ethereum as any);
-        const signer = await provider.getSigner();
-        const nftContract = new ethers.Contract(nftAddress, NFT_ABI, signer);
-        const address = await signer.getAddress();
-        
-        setContract(nftContract);
-        setUserAddress(address);
+    const initUserAddress = async () => {
+      try {
+        const address = await checkWalletConnection();
+        if (address) {
+          setUserAddress(address);
+        }
+      } catch (error) {
+        console.error('Error getting user address:', error);
       }
     };
 
-    initContract();
-  }, [nftAddress]);
+    initUserAddress();
+  }, []);
 
   const checkUserNFTs = async () => {
-    if (!contract || !userAddress) return;
+    if (!userAddress) return 0;
+    setLoading(true);
     try {
-      const balance = await contract.balanceOf(userAddress);
-      const balanceNumber = Number(balance);
+      const balance = await getUserNFTBalance(userAddress);
+      const balanceNumber = parseInt(balance);
       setNftBalance(balanceNumber);
       setHasNFT(balanceNumber > 0);
+      
+      if (balanceNumber > 0) {
+        const boost = await getUserNFTBoost(userAddress);
+        setBoostPercentage((parseFloat(boost) / 100).toString());
+      } else {
+        setBoostPercentage('0');
+      }
+      
       return balanceNumber;
     } catch (error) {
       console.error('Error checking NFT balance:', error);
       return 0;
+    } finally {
+      setLoading(false);
     }
   };
 
   const getAPYBoost = () => {
-    // Placeholder logic - return boost percentage based on NFT ownership
-    if (hasNFT) {
-      return '1.5'; // 1.5% boost for NFT holders
-    }
-    return '0';
+    return hasNFT ? boostPercentage : '0';
   };
 
   const getNFTMetadata = (tokenId: number) => {
-    // Placeholder metadata
+    const nftTypes = [
+      { name: 'Genesis Crystal', boost: '2.5%', rarity: 'Legendary', color: '#FFD700' },
+      { name: 'Quantum Multiplier', boost: '1.8%', rarity: 'Epic', color: '#9D4EDD' },
+      { name: 'Access Node', boost: '1.2%', rarity: 'Rare', color: '#06FFA5' }
+    ];
+    
+    const nftType = nftTypes[tokenId % nftTypes.length];
+    
     return {
       tokenId,
-      name: `Reward NFT #${tokenId}`,
-      description: 'Special NFT that provides APY boost',
-      apyBoost: '1.5%',
-      image: `/nft/${tokenId}.png` // placeholder image path
+      name: `${nftType.name} #${tokenId}`,
+      description: `Futuristic ${nftType.rarity} NFT providing ${nftType.boost} APY boost`,
+      apyBoost: nftType.boost,
+      rarity: nftType.rarity,
+      color: nftType.color,
+      image: `/nft/${tokenId}.png`
     };
   };
 
   const mintEligibility = (depositAmount: number) => {
-    // Check if user is eligible to mint NFT (deposit > $100 equivalent)
-    return depositAmount > 100;
+    return depositAmount >= 0.1; // 0.1 ETH minimum
+  };
+
+  const refreshData = async () => {
+    if (userAddress) {
+      await checkUserNFTs();
+    }
   };
 
   useEffect(() => {
-    if (contract && userAddress) {
+    if (userAddress) {
       checkUserNFTs();
     }
-  }, [contract, userAddress]);
+  }, [userAddress, checkUserNFTs]);
 
   return {
-    contract,
     userAddress,
     nftBalance,
     hasNFT,
@@ -149,6 +100,7 @@ export const useNFT = (nftAddress: string) => {
     checkUserNFTs,
     getAPYBoost,
     getNFTMetadata,
-    mintEligibility
+    mintEligibility,
+    refreshData
   };
 };
