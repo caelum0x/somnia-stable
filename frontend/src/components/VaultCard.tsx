@@ -103,42 +103,57 @@ const VaultCard: React.FC<VaultCardProps> = ({
   
   return (
     <div className="group relative">
-      {/* Quantum Glow Effect */}
+      {/* Enhanced Multi-Layer Glow Effect */}
       <div className={`absolute inset-0 bg-gradient-to-r ${config.gradient} rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-50`}></div>
-      
-      <div className={`relative bg-slate-900/80 backdrop-blur-sm border ${config.border} rounded-2xl p-6 hover:border-opacity-70 transition-all duration-500 h-full flex flex-col`}>
-      {/* Top Badge */}
-      <div className="absolute top-4 right-4">
-        <div className={`px-3 py-1.5 rounded-full ${getApyBadgeColor()} backdrop-blur-sm flex items-center gap-1`}>
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 7L13 15L9 11L3 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M21 7H15M21 7V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span className="font-bold">{apy}% APY</span>
+      <div className={`absolute inset-0 bg-gradient-to-r ${config.gradient} rounded-2xl blur-3xl group-hover:blur-[100px] transition-all duration-700 opacity-20`}></div>
+
+      <div className={`glass-card rounded-2xl p-6 hover:scale-105 transform transition-all duration-500 h-full flex flex-col relative overflow-hidden group-hover:shadow-2xl`}>
+        {/* Animated border */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 p-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="bg-slate-900/90 rounded-2xl h-full w-full"></div>
         </div>
-      </div>
+
+        {/* Energy beam animation */}
+        <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${config.gradient} animate-energy-beam`} style={{animationDelay: `${index * 0.5}s`}}></div>
+        {/* Enhanced Top Badge */}
+        <div className="absolute top-4 right-4 z-10">
+          <div className={`px-4 py-2 rounded-full ${getApyBadgeColor()} backdrop-blur-sm flex items-center gap-2 relative overflow-hidden group-hover:scale-110 transition-transform duration-300`}>
+            <div className="absolute inset-0 bg-white/10 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <svg className="w-4 h-4 animate-float-3d" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 7L13 15L9 11L3 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21 7H15M21 7V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="font-bold animate-neon-flicker">{apy}% APY</span>
+          </div>
+        </div>
       
       <div className="flex flex-col h-full">
-        {/* Quantum Header */}
-        <div className="flex items-start mb-6">
+        {/* Enhanced Quantum Header */}
+        <div className="flex items-start mb-6 relative">
           <div className="relative">
-            <div className={`w-16 h-16 bg-gradient-to-br ${config.gradient} rounded-2xl border ${config.border} flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500`}>
-              <span className="text-3xl animate-pulse">{displayIcon}</span>
+            <div className={`w-16 h-16 bg-gradient-to-br ${config.gradient} rounded-2xl border ${config.border} flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500 relative overflow-hidden`}>
+              <span className="text-3xl animate-float-3d relative z-10">{displayIcon}</span>
+              {/* Inner glow */}
+              <div className="absolute inset-1 bg-gradient-to-br from-white/20 to-transparent rounded-xl"></div>
             </div>
-            {/* Quantum Ring */}
+            {/* Enhanced Quantum Rings */}
             <div className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-cyan-500/50 to-purple-500/50 bg-clip-border animate-spin" style={{animationDuration: '3s'}}></div>
+            <div className="absolute inset-[-2px] rounded-2xl border border-transparent bg-gradient-to-r from-purple-500/30 to-cyan-500/30 bg-clip-border animate-spin" style={{animationDuration: '5s', animationDirection: 'reverse'}}></div>
           </div>
           <div className="ml-4 mt-1 flex-1">
-            <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent group-hover:from-cyan-400 group-hover:to-purple-400 transition-all duration-300">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent group-hover:from-cyan-400 group-hover:to-purple-400 transition-all duration-300 animate-hologram-distort">
               {displayName}
             </h3>
             <div className="flex items-center mt-2 space-x-2">
               <div className="flex items-center space-x-1">
-                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                <span className="text-green-400 text-xs font-semibold">ACTIVE</span>
+                <div className="relative">
+                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                  <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-400 animate-ping"></div>
+                </div>
+                <span className="text-green-400 text-xs font-semibold animate-neon-flicker">ACTIVE</span>
               </div>
               <div className="text-gray-500 text-xs">•</div>
-              <span className="text-gray-400 text-xs font-mono">{shortAddress}</span>
+              <span className="text-gray-400 text-xs font-mono group-hover:text-cyan-400 transition-colors duration-300">{shortAddress}</span>
             </div>
           </div>
         </div>

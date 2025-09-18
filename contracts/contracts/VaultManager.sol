@@ -8,6 +8,10 @@ contract VaultManager {
     IVault public stableVault;
     mapping(address => bool) public vaults;
     address[] public vaultList;
+    mapping(address => uint256) public userBalances;
+
+    event Deposit(address indexed user, uint256 amount, uint256 timestamp);
+    event Withdraw(address indexed user, uint256 amount, uint256 timestamp);
 
     constructor(address _stableVaultAddress) {
         owner = msg.sender;
@@ -43,21 +47,29 @@ contract VaultManager {
     }
 
     function deposit(uint256 amount) external payable {
+        require(msg.value == amount, "Sent ETH must equal amount");
         stableVault.deposit{value: amount}(amount);
+        userBalances[msg.sender] += amount;
+        emit Deposit(msg.sender, amount, block.timestamp);
     }
 
     function withdraw(uint256 amount) external {
+        require(userBalances[msg.sender] >= amount, "Insufficient balance");
         stableVault.withdraw(amount);
+        userBalances[msg.sender] -= amount;
+        payable(msg.sender).transfer(amount);
+        emit Withdraw(msg.sender, amount, block.timestamp);
     }
 
     function getTotalBalance() external view returns (uint256) {
         return stableVault.getTotalBalance();
     }
 
-    function getUserBalance(/*address user*/) external view returns (uint256) {
-        // Assuming each user has a unique balance stored in a mapping
-        // For demonstration purposes, we'll return the total balance
-        // Replace with actual user balance logic if needed
-        return stableVault.getTotalBalance();
+    function getUserBalance() external view returns (uint256) {
+        return userBalances[msg.sender];
+    }
+
+    function getUserBalance(address user) external view returns (uint256) {
+        return userBalances[user];
     }
 }

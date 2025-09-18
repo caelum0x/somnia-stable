@@ -7,10 +7,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract RewardNFT is ERC721, Ownable {
     uint256 private _tokenIdCounter;
     mapping(uint256 => uint256) public nftBoosts; // tokenId => boost percentage (e.g., 250 = 2.5%)
-    
+
     // NFT types and their boosts
     enum NFTType { Genesis, Multiplier, Access }
     mapping(uint256 => NFTType) public nftTypes;
+
+    event NFTMinted(address indexed to, uint256 indexed tokenId, NFTType nftType, uint256 boost, uint256 timestamp);
     
     constructor() ERC721("RewardNFT", "RWNFT") Ownable(msg.sender) {
         _tokenIdCounter = 1; // Start from token ID 1
@@ -19,20 +21,25 @@ contract RewardNFT is ERC721, Ownable {
     function mint(address to, NFTType nftType) public returns (uint256) {
         uint256 tokenId = _tokenIdCounter;
         _tokenIdCounter++;
-        
+
         _safeMint(to, tokenId);
-        
+
         nftTypes[tokenId] = nftType;
-        
+
         // Set boost based on NFT type
+        uint256 boost;
         if (nftType == NFTType.Genesis) {
-            nftBoosts[tokenId] = 250; // 2.5% boost
+            boost = 250; // 2.5% boost
+            nftBoosts[tokenId] = boost;
         } else if (nftType == NFTType.Multiplier) {
-            nftBoosts[tokenId] = 120; // 1.2% boost
+            boost = 120; // 1.2% boost
+            nftBoosts[tokenId] = boost;
         } else if (nftType == NFTType.Access) {
-            nftBoosts[tokenId] = 0; // No boost, just access
+            boost = 0; // No boost, just access
+            nftBoosts[tokenId] = boost;
         }
-        
+
+        emit NFTMinted(to, tokenId, nftType, boost, block.timestamp);
         return tokenId;
     }
     

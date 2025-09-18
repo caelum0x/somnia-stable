@@ -39,7 +39,7 @@ let CONTRACT_ADDRESSES = {
 
 // Try to load deployed addresses if available
 try {
-  const deployedContracts = require('./deployed-contracts.json');
+  const deployedContracts = await import('./deployed-contracts.json');
   if (deployedContracts.network === 'somniaTestnet') {
     CONTRACT_ADDRESSES = {
       STABLECOIN: deployedContracts.Stablecoin,
@@ -49,7 +49,7 @@ try {
     };
     console.log('✅ Using deployed contract addresses from Somnia testnet');
   }
-} catch (error) {
+} catch {
   console.log('📝 Using default contract addresses - deploy contracts to update');
 }
 

@@ -6,6 +6,14 @@ import VaultCard from './VaultCard';
 import DepositModal from './DepositModal';
 import WithdrawModal from './WithdrawModal';
 import { QuantumParticles, QuantumGrid, DataStream } from './QuantumEffects';
+import {
+  FloatingSpheres,
+  AuroraBackground,
+  HexMatrix,
+  DynamicGradient,
+  LaserGrid,
+  ParticleConstellation
+} from './EnhancedVisualEffects';
 
 interface DashboardProps {
   managerAddress?: string;
@@ -49,109 +57,142 @@ const Dashboard: React.FC<DashboardProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 text-white relative">
-      {/* Quantum Background Effects */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 text-white relative overflow-hidden">
+      {/* Advanced Background Effects */}
+      <AuroraBackground />
+      <DynamicGradient />
+      <ParticleConstellation />
+      <FloatingSpheres count={6} />
+      <HexMatrix />
+      <LaserGrid />
+
+      {/* Original Quantum Effects */}
       <QuantumGrid />
-      <QuantumParticles count={30} interactive={true} />
-      <DataStream direction="up" speed={1.5} density={0.2} color="cyan" />
-      <DataStream direction="down" speed={2} density={0.1} color="purple" />
+      <QuantumParticles count={40} interactive={true} colors={['cyan', 'purple', 'pink', 'gold']} />
+      <DataStream direction="up" speed={1.5} density={0.3} color="cyan" />
+      <DataStream direction="down" speed={2} density={0.15} color="purple" />
+      <DataStream direction="left" speed={1.8} density={0.1} color="pink" />
+      <DataStream direction="right" speed={1.2} density={0.1} color="gold" />
       
-      {/* Futuristic Header */}
+      {/* Enhanced Futuristic Header */}
       <div className="relative overflow-hidden z-10">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-                QUANTUM DASHBOARD
-              </h1>
-              <p className="text-cyan-300/80 text-lg">
-                {currentTime.toLocaleTimeString()} • Somnia Network • Online
-              </p>
+            <div className="relative">
+              {/* Title with enhanced effects */}
+              <div className="relative">
+                <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2 animate-neon-flicker">
+                  QUANTUM DASHBOARD
+                </h1>
+                <div className="absolute inset-0 text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2 opacity-30 blur-sm animate-pulse"></div>
+              </div>
+              <div className="flex items-center space-x-4 mt-3">
+                <div className="pulse-ring"></div>
+                <div className="pulse-ring"></div>
+                <div className="pulse-ring"></div>
+                <p className="text-cyan-300/80 text-lg font-mono">
+                  {currentTime.toLocaleTimeString()} • Somnia Network • Online
+                </p>
+              </div>
             </div>
             <div className="text-right">
-              <div className="bg-cyan-500/20 backdrop-blur-sm border border-cyan-500/30 rounded-lg px-4 py-2">
-                <p className="text-cyan-300 text-sm">NETWORK STATUS</p>
-                <p className="text-cyan-400 font-mono font-bold">⚡ OPERATIONAL</p>
+              <div className="glass-card px-6 py-4 rounded-xl relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-green-500/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative">
+                  <p className="text-cyan-300 text-sm font-semibold mb-1">NETWORK STATUS</p>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
+                    <p className="text-green-400 font-mono font-bold">⚡ OPERATIONAL</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Futuristic Stats Grid */}
+          {/* Enhanced Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-              <div className="relative bg-slate-900/80 backdrop-blur-sm border border-cyan-500/30 rounded-xl p-6 hover:border-cyan-400/50 transition-all duration-300">
+              <div className="glass-card rounded-xl p-6 hover:scale-105 transform transition-all duration-300 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-blue-400 animate-energy-beam"></div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center animate-float-3d">
                     <span className="text-2xl">💎</span>
                   </div>
-                  <div className="text-cyan-400 font-mono text-sm">TVL</div>
+                  <div className="text-cyan-400 font-mono text-sm font-bold">TVL</div>
                 </div>
-                <h3 className="text-gray-300 text-sm mb-2">Total Value Locked</h3>
-                <p className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                <h3 className="text-gray-300 text-sm mb-2 font-semibold">Total Value Locked</h3>
+                <p className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent animate-neon-flicker">
                   {protocolData.totalValueLocked} ETH
                 </p>
-                <p className="text-gray-500 text-xs mt-1">Across {vaults.length} quantum vaults</p>
+                <p className="text-gray-400 text-xs mt-1">Across {vaults.length} quantum vaults</p>
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
               </div>
             </div>
 
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-              <div className="relative bg-slate-900/80 backdrop-blur-sm border border-purple-500/30 rounded-xl p-6 hover:border-purple-400/50 transition-all duration-300">
+              <div className="glass-card rounded-xl p-6 hover:scale-105 transform transition-all duration-300 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-pink-400 animate-energy-beam" style={{animationDelay: '0.5s'}}></div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center animate-float-3d" style={{animationDelay: '1s'}}>
                     <span className="text-2xl">👛</span>
                   </div>
-                  <div className="text-purple-400 font-mono text-sm">BAL</div>
+                  <div className="text-purple-400 font-mono text-sm font-bold">BAL</div>
                 </div>
-                <h3 className="text-gray-300 text-sm mb-2">Your Balance</h3>
-                <p className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h3 className="text-gray-300 text-sm mb-2 font-semibold">Your Balance</h3>
+                <p className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent animate-neon-flicker">
                   {userData.vaultBalance} ETH
                 </p>
-                <p className="text-gray-500 text-xs mt-1">Wallet: {parseFloat(userData.walletBalance).toFixed(4)} ETH</p>
+                <p className="text-gray-400 text-xs mt-1">Wallet: {parseFloat(userData.walletBalance).toFixed(4)} ETH</p>
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
               </div>
             </div>
 
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-              <div className="relative bg-slate-900/80 backdrop-blur-sm border border-green-500/30 rounded-xl p-6 hover:border-green-400/50 transition-all duration-300">
+              <div className="glass-card rounded-xl p-6 hover:scale-105 transform transition-all duration-300 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-emerald-400 animate-energy-beam" style={{animationDelay: '1s'}}></div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center animate-float-3d" style={{animationDelay: '1.5s'}}>
                     <span className="text-2xl">📈</span>
                   </div>
-                  <div className="text-green-400 font-mono text-sm">APY</div>
+                  <div className="text-green-400 font-mono text-sm font-bold">APY</div>
                 </div>
-                <h3 className="text-gray-300 text-sm mb-2">
+                <h3 className="text-gray-300 text-sm mb-2 font-semibold">
                   {hasNFT ? 'Quantum Boosted APY' : 'Base APY'}
                 </h3>
-                <p className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                <p className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent animate-neon-flicker">
                   {effectiveAPY}%
                 </p>
                 {hasNFT && (
-                  <p className="text-green-400 text-xs mt-1 font-semibold">
+                  <p className="text-green-400 text-xs mt-1 font-semibold animate-pulse">
                     +{apyBoost}% NFT BOOST ACTIVE
                   </p>
                 )}
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-400 to-transparent"></div>
               </div>
             </div>
 
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-              <div className="relative bg-slate-900/80 backdrop-blur-sm border border-orange-500/30 rounded-xl p-6 hover:border-orange-400/50 transition-all duration-300">
+              <div className="glass-card rounded-xl p-6 hover:scale-105 transform transition-all duration-300 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 to-red-400 animate-energy-beam" style={{animationDelay: '1.5s'}}></div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center animate-float-3d" style={{animationDelay: '2s'}}>
                     <span className="text-2xl">🏆</span>
                   </div>
-                  <div className="text-orange-400 font-mono text-sm">NFT</div>
+                  <div className="text-orange-400 font-mono text-sm font-bold">NFT</div>
                 </div>
-                <h3 className="text-gray-300 text-sm mb-2">Quantum NFTs</h3>
-                <p className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+                <h3 className="text-gray-300 text-sm mb-2 font-semibold">Quantum NFTs</h3>
+                <p className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent animate-neon-flicker">
                   {nftBalance}
                 </p>
-                <p className="text-gray-500 text-xs mt-1">
+                <p className="text-gray-400 text-xs mt-1">
                   {hasNFT ? 'Enhancing rewards' : 'Mint to boost yields'}
                 </p>
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-orange-400 to-transparent"></div>
               </div>
             </div>
           </div>

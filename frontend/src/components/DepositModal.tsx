@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { depositToVault, getWalletBalance } from '../../app/services/contractService';
 import { StandardFormField, StandardButton, StandardModal, StandardBadge } from './StandardUI';
+import { useNotifications } from './NotificationSystem';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -21,9 +22,8 @@ const DepositModal: React.FC<DepositModalProps> = ({
 }) => {
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [txHash, setTxHash] = useState('');
   const [userBalance, setUserBalance] = useState('0');
+  const { notifyTransaction } = useNotifications();
 
   // Load user balance when modal opens
   React.useEffect(() => {
@@ -39,36 +39,58 @@ const DepositModal: React.FC<DepositModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || parseFloat(amount) <= 0) {
-      setError('Please enter a valid amount');
+      notifyTransaction('error', 'Invalid Amount', 'Please enter a valid amount');
       return;
     }
 
     setIsSubmitting(true);
-    setError('');
-    setTxHash('');
 
     try {
+      // Show pending notification
+      notifyTransaction(
+        'pending',
+        'Deposit Transaction Pending',
+        `Depositing ${amount} ETH to ${vaultName}...`
+      );
+
       const tx = await depositToVault(amount);
-      setTxHash(tx.hash);
-      
+
+      // Show success notification
+      notifyTransaction(
+        'success',
+        'Deposit Successful!',
+        `Successfully deposited ${amount} ETH to ${vaultName}`,
+        tx.hash
+      );
+
       // Check if eligible for NFT mint
       const amountNumber = parseFloat(amount);
-      const eligible = amountNumber >= 0.1; // NFT eligibility threshold
-      
+      if (amountNumber >= 0.1) {
+        notifyTransaction(
+          'info',
+          'NFT Eligible!',
+          'This deposit qualifies you for an Elite NFT with permanent APY boosts!'
+        );
+      }
+
       if (onSuccess) {
         onSuccess();
       }
 
       setAmount('');
-      
-      // Auto-close after showing success
+
+      // Auto-close after success
       setTimeout(() => {
         onClose();
-      }, 3000);
-      
+      }, 2000);
+
     } catch (error: any) {
       console.error('Deposit failed:', error);
-      setError(error.message || 'Deposit failed. Please try again.');
+      notifyTransaction(
+        'error',
+        'Deposit Failed',
+        error.message || 'Transaction failed. Please try again.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -85,8 +107,6 @@ const DepositModal: React.FC<DepositModalProps> = ({
   const handleClose = () => {
     if (!isSubmitting) {
       setAmount('');
-      setError('');
-      setTxHash('');
       onClose();
     }
   };
@@ -98,23 +118,6 @@ const DepositModal: React.FC<DepositModalProps> = ({
       title={`Deposit to ${vaultName}`}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
-        {error && (
-          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm">
-            {error}
-          </div>
-        )}
-
-        {txHash && (
-          <div className="mb-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 text-sm">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span>Transaction successful!</span>
-            </div>
-            <div className="mt-2 text-xs opacity-80">
-              Hash: {txHash.slice(0, 10)}...{txHash.slice(-8)}
-            </div>
-          </div>
-        )}
 
         <StandardFormField
           id="amount"
